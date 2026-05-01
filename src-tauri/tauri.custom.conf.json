@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Handy Custom",
+  "identifier": "com.pais.handy.custom",
+  "bundle": {
+    "createUpdaterArtifacts": false
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": ["https://example.invalid/handy-custom-updates-disabled.json"]
+    }
+  }
+}
