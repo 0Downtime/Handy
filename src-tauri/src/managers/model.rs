@@ -15,7 +15,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use tar::Archive;
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub enum EngineType {
@@ -653,9 +653,9 @@ impl ModelManager {
         let bundled_models = ["ggml-small.bin"]; // Add other bundled models here if any
 
         for filename in &bundled_models {
-            let bundled_path = self.app_handle.path().resolve(
-                &format!("resources/models/{}", filename),
-                tauri::path::BaseDirectory::Resource,
+            let bundled_path = crate::resolve_resource_path(
+                &self.app_handle,
+                format!("resources/models/{filename}"),
             );
 
             if let Ok(bundled_path) = bundled_path {
@@ -688,14 +688,9 @@ impl ModelManager {
 
         info!("Migrating GigaAM from single-file to directory format");
 
-        let vocab_path = self
-            .app_handle
-            .path()
-            .resolve(
-                "resources/models/gigaam_vocab.txt",
-                tauri::path::BaseDirectory::Resource,
-            )
-            .map_err(|e| anyhow::anyhow!("Failed to resolve GigaAM vocab path: {}", e))?;
+        let vocab_path =
+            crate::resolve_resource_path(&self.app_handle, "resources/models/gigaam_vocab.txt")
+                .map_err(|e| anyhow::anyhow!("Failed to resolve GigaAM vocab path: {}", e))?;
 
         info!(
             "Resolved vocab path: {:?} (exists: {})",

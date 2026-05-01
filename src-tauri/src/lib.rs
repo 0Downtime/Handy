@@ -34,6 +34,7 @@ use managers::transcription::TranscriptionManager;
 use signal_hook::consts::{SIGUSR1, SIGUSR2};
 #[cfg(unix)]
 use signal_hook::iterator::Signals;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU8, Ordering};
 use std::sync::Arc;
 use tauri::image::Image;
@@ -59,6 +60,29 @@ fn level_filter_from_u8(value: u8) -> log::LevelFilter {
         4 => log::LevelFilter::Debug,
         5 => log::LevelFilter::Trace,
         _ => log::LevelFilter::Trace,
+    }
+}
+
+pub(crate) fn resolve_resource_path(
+    app: &AppHandle,
+    path: impl AsRef<Path>,
+) -> Result<PathBuf, tauri::Error> {
+    match app
+        .path()
+        .resolve(path.as_ref(), tauri::path::BaseDirectory::Resource)
+    {
+        Ok(path) => Ok(path),
+        #[cfg(debug_assertions)]
+        Err(err) => {
+            let dev_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(path.as_ref());
+            if dev_path.exists() {
+                Ok(dev_path)
+            } else {
+                Err(err)
+            }
+        }
+        #[cfg(not(debug_assertions))]
+        Err(err) => Err(err),
     }
 }
 
@@ -194,10 +218,8 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     let tray = TrayIconBuilder::new()
         .icon(
             Image::from_path(
-                app_handle
-                    .path()
-                    .resolve(initial_icon_path, tauri::path::BaseDirectory::Resource)
-                    .unwrap(),
+                resolve_resource_path(app_handle, initial_icon_path)
+                    .expect("failed to resolve initial tray icon path"),
             )
             .unwrap(),
         )
