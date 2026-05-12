@@ -210,7 +210,7 @@ fn slow_type_key_for_char(ch: char) -> Option<SlowTypeKey> {
         '.' => (Key::Unicode('.'), false),
         '>' => (Key::Unicode('.'), true),
         '/' => (Key::Unicode('/'), false),
-        '?' => (Key::Unicode('/'), true),
+        '?' => return Some(question_mark_slow_type_key()),
         '`' => (Key::Unicode('`'), false),
         '~' => (Key::Unicode('`'), true),
         '\u{2019}' => return Some(SlowTypeKey::TextFallback("'")),
@@ -219,6 +219,26 @@ fn slow_type_key_for_char(ch: char) -> Option<SlowTypeKey> {
     };
 
     Some(SlowTypeKey::Key { key, shift })
+}
+
+fn question_mark_slow_type_key() -> SlowTypeKey {
+    #[cfg(target_os = "macos")]
+    {
+        // Enigo maps Unicode('/') to the keypad divide key on macOS, where Shift
+        // still produces '/'. Use the ANSI slash key so Shift yields '?'.
+        return SlowTypeKey::Key {
+            key: Key::Other(44),
+            shift: true,
+        };
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        SlowTypeKey::Key {
+            key: Key::Unicode('/'),
+            shift: true,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -243,10 +263,7 @@ mod tests {
         );
         assert_eq!(
             slow_type_key_for_char('?'),
-            Some(SlowTypeKey::Key {
-                key: Key::Unicode('/'),
-                shift: true
-            })
+            Some(question_mark_slow_type_key())
         );
         assert_eq!(
             slow_type_key_for_char(' '),
