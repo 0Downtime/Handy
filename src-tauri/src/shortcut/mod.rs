@@ -550,6 +550,10 @@ pub fn change_overlay_position_setting(app: AppHandle, position: String) -> Resu
     settings.overlay_position = parsed;
     settings::write_settings(&app, settings);
 
+    // Keep the cached overlay-enabled flag in sync so emit_levels stops
+    // (or resumes) emitting on the next audio callback.
+    crate::overlay::update_overlay_enabled_cache(parsed != OverlayPosition::None);
+
     // Update overlay position without recreating window
     crate::utils::update_overlay_position(&app);
 
@@ -562,6 +566,10 @@ pub fn change_debug_mode_setting(app: AppHandle, enabled: bool) -> Result<(), St
     let mut settings = settings::get_settings(&app);
     settings.debug_mode = enabled;
     settings::write_settings(&app, settings);
+
+    // Keep webview log streaming in sync: the live log viewer only exists in
+    // debug mode, so logs are forwarded to the frontend only while it is on.
+    crate::WEBVIEW_LOG_STREAMING.store(enabled, std::sync::atomic::Ordering::Relaxed);
 
     // Emit event to notify frontend of debug mode change
     let _ = app.emit(

@@ -453,6 +453,17 @@
         "title": "Nível de Log",
         "description": "Definir a verbosidade do registro"
       },
+      "liveLogs": {
+        "title": "Logs ao Vivo",
+        "description": "Transmita os logs do aplicativo em tempo real para diagnosticar problemas sem abrir o arquivo de log. Apenas os logs emitidos enquanto este painel estiver aberto são exibidos; respeita a configuração de Nível de Log acima.",
+        "live": "Ao Vivo",
+        "paused": "Pausado",
+        "pause": "Pausar",
+        "resume": "Retomar",
+        "copied": "Copiado",
+        "lineCount": "{{count}} linhas",
+        "empty": "Aguardando logs… As entradas aparecem aqui à medida que o app as emite."
+      },
       "updateChecks": {
         "label": "Verificar Atualizações",
         "description": "Verificar automaticamente novas versões do Handy"
@@ -562,9 +573,9 @@
     "installing": "Instalando...",
     "preparing": "Preparando...",
     "checkForUpdates": "Verificar atualizações",
-    "portableUpdateTitle": "Manual update required",
-    "portableUpdateMessage": "Portable installs cannot be updated automatically. To update: download the latest NSIS installer from GitHub Releases, install it to the same folder, then copy your Data/ folder (settings, models, recordings) from the old version to the new one.",
-    "portableUpdateButton": "Open GitHub Releases"
+    "portableUpdateTitle": "Atualização manual necessária",
+    "portableUpdateMessage": "Instalações portáteis não podem ser atualizadas automaticamente. Para atualizar: baixe o instalador NSIS mais recente do GitHub Releases, instale-o na mesma pasta e, em seguida, copie sua pasta Data/ (configurações, modelos, gravações) da versão antiga para a nova.",
+    "portableUpdateButton": "Abrir GitHub Releases"
   },
   "common": {
     "loading": "Carregando...",
@@ -579,6 +590,8 @@
     "update": "Atualizar",
     "close": "Fechar",
     "open": "Abrir",
+    "copy": "Copiar",
+    "clear": "Limpar",
     "default": "Padrão",
     "enabled": "Habilitado",
     "disabled": "Desabilitado",
